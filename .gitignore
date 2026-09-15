@@ -1,0 +1,5 @@
+# Visual Studio / build artifacts at solution root
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
