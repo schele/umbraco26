@@ -1,5 +1,6 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IBase>
+﻿@using Umbraco26.Models
+
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IPageViewModel>
 
 @{
 	Layout = null;
@@ -8,7 +9,7 @@
 <html>
 	<head>
 		<title></title>
-		<meta name="description" value="@Html.Raw(Model.MetaDescription)" />
+		<meta name="description" content="@Model.Content.MetaDescription" />
 	</head>
 
 	<body>
