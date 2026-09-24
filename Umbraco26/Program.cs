@@ -1,4 +1,7 @@
 
+using Umbraco26.Business.Services;
+using Umbraco26.Business.Services.Interfaces;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
@@ -6,6 +9,8 @@ builder.CreateUmbracoBuilder()
     .AddWebsite()
     .AddComposers()
     .Build();
+
+builder.Services.AddScoped<ISitemapService, SitemapService>();
 
 WebApplication app = builder.Build();
 
