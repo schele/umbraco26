@@ -1,0 +1,35 @@
+﻿using Newtonsoft.Json;
+
+namespace Umbraco26.Models
+{
+    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+    public class Root
+    {
+        [JsonProperty("Search")]
+        public List<OmdbMovie> Search { get; set; }
+
+        [JsonProperty("totalResults")]
+        public string TotalResults { get; set; }
+
+        [JsonProperty("Response")]
+        public string Response { get; set; }
+    }
+
+    public class OmdbMovie
+    {
+        [JsonProperty("Title")]
+        public string Title { get; set; }
+
+        [JsonProperty("Year")]
+        public string Year { get; set; }
+
+        [JsonProperty("imdbID")]
+        public string ImdbID { get; set; }
+
+        [JsonProperty("Type")]
+        public string Type { get; set; }
+
+        [JsonProperty("Poster")]
+        public string Poster { get; set; }
+    }
+}

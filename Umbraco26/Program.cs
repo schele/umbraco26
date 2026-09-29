@@ -11,12 +11,17 @@ builder.CreateUmbracoBuilder()
     .Build();
 
 builder.Services.AddScoped<ISitemapService, SitemapService>();
+builder.Services.AddScoped<IOmdbService, OmdbService>();
+builder.Services.AddScoped<IMoviesJob, MoviesJob>();
+
+
+builder.Services.AddServerSideBlazor();
 
 WebApplication app = builder.Build();
 
+app.MapBlazorHub();
 
 await app.BootUmbracoAsync();
-
 
 app.UseUmbraco()
     .WithMiddleware(u =>

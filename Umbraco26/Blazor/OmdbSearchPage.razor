@@ -1,0 +1,104 @@
+@page "/OmdbSearchPage"
+
+@using System.Globalization
+@using Umbraco.Cms.Web.Common
+@using Umbraco26.Business.Services.Interfaces
+@using Umbraco26.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject UmbracoHelper _umbracoHelper
+
+@code{
+    [Inject]
+    private IOmdbService _omdbService { get; set; }
+
+    [Parameter]
+    public string CultureName { get; set; } = string.Empty;
+
+    private CultureInfo CultureInfo { get; set; }
+    private OmdbSearchModel SearchModel = new OmdbSearchModel();
+    private List<OmdbMovie>? Movies = [];
+    private bool IsSearching = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CultureInfo = new CultureInfo(CultureName);
+    }
+
+    private async Task FetchMoviesAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchModel.Query))
+        {
+            return;
+        }
+        else
+        {
+            Movies?.Clear();
+            IsSearching = true;
+
+            try
+            {
+                await Task.Delay(750);
+                Movies = await _omdbService.SearchAsync(SearchModel);
+            }
+            finally
+            {
+                IsSearching = false;
+            }
+        }
+    }
+}
+
+<div class="container py-5">
+    <EditForm Model="@SearchModel" OnValidSubmit="FetchMoviesAsync">
+        <div class="container py-5">
+            <div class="row mb-4">
+                <div class="col-md-8 offset-md-2">
+                    <div class="input-group">
+                        <InputText id="searchInput" class="form-control search-input" name="query" type="search"
+                                   placeholder="Search for a movie" aria-label="Search"
+                        @bind-Value ="SearchModel.Query" disabled="@IsSearching" />
+                        <button type="submit" class="input-group-text search-button" id="submitButton" disabled="@IsSearching">
+                            @if (IsSearching)
+                            {
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-search"></i>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-4">
+        @if (Movies != null)
+        {
+            foreach (var item in Movies)
+            {
+                <div class="col">
+                    <div class="card h-100 d-flex flex-column shadow-sm text-center">
+                        <div class="poster-wrapper">
+                            <img src="@item.Poster" class="card-img-top img-fluid" alt="Movie Poster" onerror="this.onerror=null;this.src='/_framework/no-image-found.png';">
+                        </div>
+                        <div class="card-body flex-grow-1">
+                            <h5 class="card-title">@item.Title</h5>
+                        </div>
+                        <div class="card-footer mt-auto" style="min-height: 45px;">
+                            <small class="text-body-secondary">@item.Year · @item.Type</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else if (!IsSearching && !string.IsNullOrWhiteSpace(SearchModel.Query))
+        {
+            <div class="alert alert-warning mt-3" role="alert">
+                @_umbracoHelper.GetDictionaryValue("NoResultsFound", CultureInfo) "@SearchModel.Query"
+            </div>
+        }
+    </div>
+</div>

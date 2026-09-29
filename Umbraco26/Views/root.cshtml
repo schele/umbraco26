@@ -1,6 +1,7 @@
 ﻿@using Umbraco26.Models
+@using UmbracoViewPage = Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IPageViewModel>
+@inherits UmbracoViewPage<IPageViewModel>
 
 @{
 	Layout = null;
@@ -10,11 +11,16 @@
 	<head>
 		<title></title>
 		<meta name="description" content="@Model.Content.MetaDescription" />
+		<base href="~/" />
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 	</head>
 
 	<body>
 		<div>
 			@RenderBody()
 		</div>
+		<script src="_framework/blazor.server.js"></script>
 	</body>
 </html>
+
+
