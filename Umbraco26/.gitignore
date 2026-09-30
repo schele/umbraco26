@@ -475,6 +475,11 @@ umbraco-package-schema.json
 /umbraco/Data/*.sqlite.db-shm
 /umbraco/Data/*.sqlite.db-wal
 
+# Hangfire SQLite job storage
+/umbraco/Data/Hangfire.db
+/umbraco/Data/Hangfire.db-shm
+/umbraco/Data/Hangfire.db-wal
+
 # Log files
 /umbraco/Logs/
 
