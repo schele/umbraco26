@@ -9,9 +9,6 @@
 	var cultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
 }
 
-@if (Model.Carousel != null)
-{
-	@await Html.PartialAsync("~/Views/Partials/carousel.cshtml", Model.Carousel)
-}
+@await Html.GetBlockListHtmlAsync(Model.Content.Carousel)
 
 <component type="typeof(OmdbSearchPage)" render-mode="Server" param-CultureName="@cultureName" />
