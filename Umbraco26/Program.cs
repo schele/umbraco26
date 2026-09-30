@@ -13,6 +13,7 @@ builder.CreateUmbracoBuilder()
 builder.Services.AddScoped<ISitemapService, SitemapService>();
 builder.Services.AddScoped<IOmdbService, OmdbService>();
 builder.Services.AddScoped<IMoviesJob, MoviesJob>();
+builder.Services.AddScoped<IFindService, FindService>();
 
 
 builder.Services.AddServerSideBlazor();

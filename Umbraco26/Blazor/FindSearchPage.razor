@@ -1,0 +1,224 @@
+@using System.Globalization
+@using Umbraco.Cms.Web.Common
+@using Umbraco26.Business.Services.Interfaces
+@using Umbraco26.Models
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inject UmbracoHelper _umbracoHelper
+
+@code{
+    private const int PageSize = 10;
+
+    /// <summary>How many page numbers to show on each side of the current page.</summary>
+    private const int PageWindow = 2;
+
+    [Inject]
+    private IFindService _findService { get; set; } = default!;
+
+    [Parameter]
+    public string CultureName { get; set; } = string.Empty;
+
+    private CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
+    private FindSearchModel SearchModel = new FindSearchModel();
+    private FindResult Result = FindResult.Empty;
+    private int CurrentPage = 1;
+    private bool IsSearching = false;
+    private ElementReference ResultsHeading;
+    private bool FocusResultsAfterRender;
+
+    /// <summary>The query of the last submitted search; null until the first search.</summary>
+    private string? SearchedQuery;
+
+    private int TotalPages => (int)Math.Ceiling(Result.TotalCount / (double)PageSize);
+
+    protected override void OnInitialized()
+    {
+        CultureInfo = new CultureInfo(CultureName);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Moving focus to the results scrolls them into view and lets screen readers announce the new page.
+        if (FocusResultsAfterRender)
+        {
+            FocusResultsAfterRender = false;
+            await ResultsHeading.FocusAsync();
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchModel.Query))
+        {
+            return;
+        }
+
+        var query = SearchModel.Query.Trim();
+        IsSearching = true;
+
+        try
+        {
+            // Same pause as OmdbSearchPage, so the spinner is actually visible for a local search.
+            await Task.Delay(750);
+            SearchedQuery = query;
+            LoadPage(1);
+        }
+        finally
+        {
+            IsSearching = false;
+        }
+    }
+
+    private void GoToPage(int page)
+    {
+        if (page < 1 || page > TotalPages || page == CurrentPage)
+        {
+            return;
+        }
+
+        LoadPage(page);
+        FocusResultsAfterRender = true;
+    }
+
+    private void LoadPage(int page)
+    {
+        CurrentPage = page;
+        Result = _findService.FindContent(SearchedQuery!, CultureInfo, CurrentPage, PageSize);
+    }
+
+    /// <summary>The page numbers to show, where null marks a gap: 1 … 4 5 [6] 7 8 … 20.</summary>
+    private IEnumerable<int?> PageNumbers()
+    {
+        var previous = 0;
+
+        for (var page = 1; page <= TotalPages; page++)
+        {
+            if (page == 1 || page == TotalPages || Math.Abs(page - CurrentPage) <= PageWindow)
+            {
+                if (page - previous > 1)
+                {
+                    yield return null;
+                }
+
+                yield return page;
+                previous = page;
+            }
+        }
+    }
+
+    private string Text(string key, string defaultValue) => _umbracoHelper.GetDictionaryValueOrDefault(key, CultureInfo, defaultValue);
+}
+
+<section class="bg-dark text-white py-5 mb-5" data-bs-theme="dark">
+    <div class="container py-lg-4">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">@Text("Find.Heading", "Search the site")</h1>
+                <p class="lead text-body-secondary mb-4">@Text("Find.Lead", "Find pages by their title or description.")</p>
+
+                <EditForm Model="@SearchModel" OnValidSubmit="SearchAsync" role="search">
+                    <div class="input-group input-group-lg shadow">
+                        <InputText id="findInput" class="form-control border-end-0" type="search"
+                                   placeholder="@Text("Find.Placeholder", "What are you looking for?")" aria-label="@Text("Find.Placeholder", "What are you looking for?")"
+                                   @bind-Value="SearchModel.Query" disabled="@IsSearching" />
+                        <button type="submit" class="input-group-text bg-body border-start-0 search-icon-button"
+                                disabled="@IsSearching" aria-label="@Text("Find.Submit", "Search")">
+                            @* The glass stays in the layout (invisible) so the button keeps its size while the spinner shows. *@
+                            <i class="fas fa-magnifying-glass text-body-secondary @(IsSearching ? "invisible" : null)" aria-hidden="true"></i>
+                            @if (IsSearching)
+                            {
+                                <span class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                    <span class="spinner-border spinner-border-sm text-warning" aria-hidden="true"></span>
+                                </span>
+                                <span class="visually-hidden" role="status">@Text("Find.Searching", "Searching…")</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            @if (Result.Hits.Count > 0)
+            {
+                <div class="d-flex justify-content-between align-items-baseline mb-3">
+                    <h2 class="h5 mb-0 find-results-heading" tabindex="-1" @ref="ResultsHeading">@Text("Find.ResultsFor", "Results for") “@SearchedQuery”</h2>
+                    <span class="text-body-secondary small">@Result.TotalCount @(Result.TotalCount == 1 ? Text("Find.Hit", "hit") : Text("Find.Hits", "hits"))</span>
+                </div>
+
+                <div class="list-group list-group-flush border-top border-bottom">
+                    @foreach (var hit in Result.Hits)
+                    {
+                        <article class="list-group-item bg-transparent px-0 py-4">
+                            <time class="small text-body-secondary" datetime="@hit.UpdateDate.ToString("yyyy-MM-dd")">@hit.UpdateDate.ToString("d MMMM yyyy", CultureInfo)</time>
+                            <h3 class="h5 mt-1 mb-2 find-hit-title">
+                                <a href="@hit.Url" class="clean-link">@hit.Name</a>
+                            </h3>
+                            @if (!string.IsNullOrWhiteSpace(hit.Description))
+                            {
+                                <p class="text-body-secondary mb-2 find-hit-description">@hit.Description</p>
+                            }
+                            @* Duplicate of the heading link, so hide it from keyboard and screen reader users. *@
+                            <a href="@hit.Url" class="icon-link small fw-semibold" tabindex="-1" aria-hidden="true">
+                                @Text("Find.ReadMore", "Read more")<i class="fas fa-arrow-right"></i>
+                            </a>
+                        </article>
+                    }
+                </div>
+
+                @if (TotalPages > 1)
+                {
+                    <nav class="mt-4" aria-label="@Text("Find.Pagination", "Search result pages")">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(CurrentPage == 1 ? "disabled" : null)">
+                                <button type="button" class="page-link" disabled="@(CurrentPage == 1)" aria-label="@Text("Find.Previous", "Previous")"
+                                        @onclick="() => GoToPage(CurrentPage - 1)">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </button>
+                            </li>
+                            @foreach (var page in PageNumbers())
+                            {
+                                if (page is int number)
+                                {
+                                    <li class="page-item @(number == CurrentPage ? "active" : null)">
+                                        <button type="button" class="page-link" aria-current="@(number == CurrentPage ? "page" : null)"
+                                                @onclick="() => GoToPage(number)">@number</button>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item disabled" aria-hidden="true"><span class="page-link">…</span></li>
+                                }
+                            }
+                            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : null)">
+                                <button type="button" class="page-link" disabled="@(CurrentPage == TotalPages)" aria-label="@Text("Find.Next", "Next")"
+                                        @onclick="() => GoToPage(CurrentPage + 1)">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+            else if (SearchedQuery != null)
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-face-frown fa-3x text-body-secondary mb-3"></i>
+                    <p class="lead mb-0">@Text("NoResultsFound", "No results found for") “@SearchedQuery”</p>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-body-secondary">
+                    <i class="fas fa-magnifying-glass fa-3x mb-3"></i>
+                    <p class="mb-0">@Text("Find.StartTyping", "Type what you're looking for above to search.")</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

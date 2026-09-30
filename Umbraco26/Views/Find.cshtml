@@ -1,7 +1,12 @@
-﻿@inherits UmbracoViewPage<Find>
+﻿@using Umbraco26.Models.ViewModels
+@using Umbraco26.Blazor
+
+@inherits UmbracoViewPage<FindPageViewModel>
 
 @{
 	Layout = "root.cshtml";
+
+	var cultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
 }
 
-<h1>FIND</h1>
+<component type="typeof(FindSearchPage)" render-mode="Server" param-CultureName="@cultureName" />
