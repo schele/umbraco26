@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Carousel</summary>
 	[PublishedModel("carousel")]
-	public partial class Carousel : PublishedContentModel, IBase
+	public partial class Carousel : CarouselContainer, IBase
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops Image => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "image");
 
 		///<summary>
-		/// MetaDescription
+		/// Meta Description
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "18.1.1+2d8d866")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
