@@ -10,12 +10,12 @@
 
 @code{
     [Inject]
-    private IOmdbService _omdbService { get; set; }
+    private IOmdbService _omdbService { get; set; } = default!;
 
     [Parameter]
     public string CultureName { get; set; } = string.Empty;
 
-    private CultureInfo CultureInfo { get; set; }
+    private CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
     private OmdbSearchModel SearchModel = new OmdbSearchModel();
     private List<OmdbMovie>? Movies = [];
     private bool IsSearching = false;

@@ -30,6 +30,6 @@ namespace Umbraco26.Business.Services
 
     internal class MyMovie
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

@@ -8,7 +8,7 @@ namespace Umbraco26.Composers
     {
         public void Compose(IUmbracoBuilder builder)
         {
-            RecurringJob.AddOrUpdate<IMoviesJob>("Add movies", x => x.AddMovies(null), Cron.Never);
+            RecurringJob.AddOrUpdate<IMoviesJob>("Add movies", x => x.AddMovies(null!), Cron.Never);
         }
     }
 }

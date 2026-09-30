@@ -40,6 +40,12 @@ namespace Umbraco26.Business.Services
 			foreach (var item in results)
 			{
 				var page = umbracoContext?.Content?.GetById(int.Parse(item.Id));
+
+				if (page == null)
+				{
+					continue;
+				}
+
 				var name = page.Name(_variationContextAccessor, cultureInfo.Name);
 
 				var hit = new Hit

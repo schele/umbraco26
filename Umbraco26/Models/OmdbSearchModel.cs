@@ -2,6 +2,6 @@
 {
     public class OmdbSearchModel
     {
-        public string Query { get; set; }
+        public string Query { get; set; } = string.Empty;
     }
 }

@@ -9,6 +9,6 @@ namespace Umbraco26.Models.ViewModels
         {
         }
 
-        public IEnumerable<IPublishedContent> Pages { get; set; }
+        public IEnumerable<IPublishedContent> Pages { get; set; } = [];
     }
 }
