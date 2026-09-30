@@ -1,0 +1,17 @@
+{
+  "id": "umbraco26.carousel-preview",
+  "name": "Carousel Block Preview",
+  "version": "1.0.0",
+  "allowTelemetry": false,
+  "extensions": [
+    {
+      "type": "blockEditorCustomView",
+      "alias": "Umbraco26.BlockView.Carousel",
+      "name": "Carousel Block Preview",
+      "element": "/App_Plugins/CarouselPreview/carousel-preview.element.js",
+      "elementName": "umbraco26-carousel-preview",
+      "forContentTypeAlias": "carouselBlock",
+      "forBlockEditor": "block-list"
+    }
+  ]
+}
