@@ -13,5 +13,9 @@ namespace Umbraco26.Models
         Start? StartPage { get; }
 
         string UrlSegment { get; }
+
+        string PageTitle { get; }
+
+        string MetaDescription { get; }
     }
 }

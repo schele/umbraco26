@@ -9,6 +9,9 @@
 	var cultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
 }
 
-@await Html.GetBlockListHtmlAsync(Model.Content.Carousel)
+@if (Model.Carousel != null)
+{
+	@await Html.PartialAsync("~/Views/Partials/carousel.cshtml", Model.Carousel)
+}
 
-<component type="typeof(OmdbSearchPage)" render-mode="Server" param-CultureName="@cultureName" />
+<component type="typeof(OmdbSearchPage)" render-mode="Server" param-CultureName="@cultureName" param-MoviePageUrl="@Model.MoviePageUrl" />

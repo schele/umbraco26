@@ -10,6 +10,10 @@ namespace Umbraco26.Models
 
         public Start? StartPage => Content.AncestorOrSelf<Start>();
 
+        public virtual string PageTitle => Content.Name;
+
+        public virtual string MetaDescription => Content.MetaDescription ?? string.Empty;
+
         /// <summary>Populated by <c>BasePageController</c> when the model is built.</summary>
         public string UrlSegment { get; set; } = string.Empty;
     }

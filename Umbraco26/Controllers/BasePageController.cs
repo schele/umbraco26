@@ -24,13 +24,18 @@ namespace Umbraco26.Controllers
                 return NotFound();
             }
 
-            TViewModel model = Build(page);
+            return PageResult(page, Build(page));
+        }
+
+        protected abstract TViewModel Build(TContent page);
+
+        /// <summary>Renders the current template; for actions that build their model asynchronously.</summary>
+        protected IActionResult PageResult(TContent page, TViewModel model)
+        {
             model.UrlSegment = GetUrlSegment(page);
 
             return CurrentTemplate(model);
         }
-
-        protected abstract TViewModel Build(TContent page);
 
         private string GetUrlSegment(IBase content)
         {

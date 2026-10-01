@@ -50,6 +50,33 @@ namespace Umbraco26.Business.Services
             return [];
         }
 
+        public async Task<OmdbMovieDetails?> GetByIdAsync(string imdbId)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.omdbapi.com/?i={Uri.EscapeDataString(imdbId)}&plot=full&apikey=520a49c5");
+                var response = await _httpClient.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var movie = JsonConvert.DeserializeObject<OmdbMovieDetails>(json);
+
+                    // OMDb answers unknown ids with 200 and Response "False"
+                    if (movie != null && movie.Response == "True")
+                    {
+                        return movie;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
+
+            return null;
+        }
+
         //public async Task<string?> AddMovieAsync(string id)
         //{
         //    try

@@ -1,0 +1,57 @@
+/* Movie detail page */
+
+.movie-hero {
+	position: relative;
+	overflow: hidden;
+}
+
+/* Blurred poster behind the hero, faded into the dark background */
+.movie-hero-backdrop {
+	position: absolute;
+	inset: -2rem;
+	background-size: cover;
+	background-position: center;
+	filter: blur(24px);
+	opacity: .25;
+}
+
+.movie-hero-backdrop::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to right, var(--bs-dark) 10%, transparent);
+}
+
+.movie-hero .breadcrumb-item + .breadcrumb-item::before,
+.movie-hero .breadcrumb-item.active {
+	color: var(--bs-secondary-color);
+}
+
+.movie-poster {
+	aspect-ratio: 2/3;
+	overflow: hidden;
+}
+
+.movie-poster img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.movie-metascore {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	background-color: var(--bs-success);
+	color: var(--bs-white);
+}
+
+.movie-avatar {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+}
