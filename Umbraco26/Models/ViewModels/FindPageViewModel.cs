@@ -2,7 +2,7 @@
 
 namespace Umbraco26.Models.ViewModels
 {
-    //public class FindPageViewModel : PageViewModel<Find>
-    //{
-    //}
+    public class FindPageViewModel : PageViewModel<Find>
+    {
+    }
 }
