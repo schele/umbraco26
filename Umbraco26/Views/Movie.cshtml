@@ -1,4 +1,5 @@
 @using Umbraco26.Models.ViewModels
+@using Umbraco26.Blazor
 
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<MoviePageViewModel>
 
@@ -32,6 +33,7 @@
 	var awards = Value(movie?.Awards);
 	var boxOffice = Value(movie?.BoxOffice);
 	var ratings = movie?.Ratings ?? [];
+	var cultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
 
 	var details = new (string Label, string? Value)[]
 	{
@@ -226,6 +228,11 @@
 							</ul>
 						</div>
 					</section>
+				}
+
+				@if (imdbId != null)
+				{
+					<component type="typeof(MovieRatingBox)" render-mode="Server" param-ImdbId="@imdbId" param-CultureName="@cultureName" />
 				}
 
 				@if (awards != null)

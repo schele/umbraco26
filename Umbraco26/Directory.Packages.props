@@ -13,6 +13,9 @@
     <PackageVersion Include="Cultiv.Hangfire" Version="5.5.4" />
     <PackageVersion Include="Umbraco.Cms" Version="18.1.1" />
     <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="18.1.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" />
+    <!-- Aligns the Roslyn version EF Design pulls in with the one ModelsBuilder uses, or dotnet ef fails to load -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.6.0" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="$(UmbracoAppLocalIcuVersion)" />
   </ItemGroup>
 </Project>
