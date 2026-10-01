@@ -12,8 +12,10 @@ namespace Umbraco26.Composers
     {
         public void Compose(IUmbracoBuilder builder)
         {
-            builder.Services.AddUmbracoDbContext<MovieRatingContext>((serviceProvider, options, _, _)
-                => options.UseUmbracoDatabaseProvider(serviceProvider));
+            // The ratings live in the Umbraco database, so share its connection and transaction
+            builder.Services.AddUmbracoDbContext<MovieRatingContext>(
+                (serviceProvider, options, _, _) => options.UseUmbracoDatabaseProvider(serviceProvider),
+                shareUmbracoConnection: true);
 
             builder.Services.AddScoped<IMovieRatingService, MovieRatingService>();
 
