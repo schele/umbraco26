@@ -36,14 +36,23 @@ namespace Umbraco26.Business.Services
 				return FindResult.Empty;
 			}
 
-			// Variant fields are indexed per culture (nodeName_sv, metaDescription_en-us, ...), so only
-			// match the requested language, and only pages published in it.
+			// Pages whose type varies by culture are indexed per culture (nodeName_sv, metaDescription_en-us, ...),
+			// invariant pages (e.g. articles) only under the plain field names. Variant pages also get the plain
+			// nodeName (in the default language), so the plain fields only count for invariant pages.
 			var culture = cultureInfo.Name.ToLowerInvariant();
 
 			var results = index.Searcher
 				.CreateQuery(IndexTypes.Content)
-				.ManagedQuery(query, [$"{UmbracoExamineFieldNames.NodeNameFieldName}_{culture}", $"metaDescription_{culture}"])
-				.And().Field($"{UmbracoExamineFieldNames.PublishedFieldName}_{culture}", "y")
+				.Group(text => text
+					.ManagedQuery(query, [$"{UmbracoExamineFieldNames.NodeNameFieldName}_{culture}", $"metaDescription_{culture}"])
+					.Or(invariant => invariant
+						.ManagedQuery(query, [UmbracoExamineFieldNames.NodeNameFieldName, "metaDescription"])
+						.And().Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n")))
+				// Variant pages must be published in this language; invariant pages are in every language
+				.And().Group(published => published
+					.Field($"{UmbracoExamineFieldNames.PublishedFieldName}_{culture}", "y")
+					.Or().Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n"))
+				.And().Field(UmbracoExamineFieldNames.PublishedFieldName, "y")
 				.Not().GroupedOr([ExamineFieldNames.ItemTypeFieldName], ExcludedContentTypes)
 				.Execute(QueryOptions.SkipTake((Math.Max(page, 1) - 1) * pageSize, pageSize));
 
