@@ -14,7 +14,7 @@ namespace Umbraco26.Business.Services
     {
         public const string Purpose = "Umbraco26.ContactForm.Token";
 
-        public static readonly TimeSpan Lifetime = TimeSpan.FromHours(2);
+        public static readonly TimeSpan Lifetime = TimeSpan.FromHours(24);
 
         /// <summary>People need longer than this to fill in a name, an email and a comment.</summary>
         public static readonly TimeSpan MinimumFillTime = TimeSpan.FromSeconds(3);

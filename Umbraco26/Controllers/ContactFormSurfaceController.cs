@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
@@ -16,7 +17,8 @@ namespace Umbraco26.Controllers
 {
     /// <summary>
     /// Receives the contact form block's classic POST and redirects back to the page with
-    /// <c>?contact=sent|invalid|expired#contact-form</c> (Post/Redirect/Get).
+    /// <c>?contact=sent|invalid|expired#contact-form</c> (Post/Redirect/Get). On invalid and expired the
+    /// visitor's input is kept in TempData, so the form comes back filled in.
     /// </summary>
     public class ContactFormSurfaceController(
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -25,13 +27,14 @@ namespace Umbraco26.Controllers
         AppCaches appCaches,
         IProfilingLogger profilingLogger,
         IPublishedUrlProvider publishedUrlProvider,
+        IAntiforgery antiforgery,
         IContactFormTokenService tokenService,
         IContactSubmissionService submissionService,
         ILogger<ContactFormSurfaceController> logger)
         : SurfaceController(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
     {
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [IgnoreAntiforgeryToken] // Validated below, so a failure can keep the input and say "expired" instead of a bare 400
         public async Task<IActionResult> Submit(ContactFormModel model)
         {
             if (CurrentPage is not IPublishedContent page)
@@ -46,25 +49,52 @@ namespace Umbraco26.Controllers
                 return RedirectToPage(page, ContactFormStatus.Sent);
             }
 
+            if (!await antiforgery.IsRequestValidAsync(HttpContext))
+            {
+                logger.LogInformation("Contact form on page {PageKey} failed anti-forgery validation; nothing was stored.", page.Key);
+                return KeepInputAndRedirect(page, ContactFormStatus.Expired);
+            }
+
             switch (tokenService.Validate(model.FormToken, page.Key))
             {
                 case ContactFormTokenStatus.Invalid:
+                    logger.LogInformation("Contact form on page {PageKey} had a missing, changed or expired form token; nothing was stored.", page.Key);
+                    return KeepInputAndRedirect(page, ContactFormStatus.Expired);
+
                 case ContactFormTokenStatus.WrongPage:
-                    return RedirectToPage(page, ContactFormStatus.Expired);
+                    logger.LogInformation("Contact form on page {PageKey} had a form token issued for another page; nothing was stored.", page.Key);
+                    return KeepInputAndRedirect(page, ContactFormStatus.Expired);
 
                 case ContactFormTokenStatus.TooFast:
                     logger.LogInformation("Contact form on page {PageKey} was sent too soon after it was shown; nothing was stored.", page.Key);
                     return RedirectToPage(page, ContactFormStatus.Sent);
             }
 
-            if (!ModelState.IsValid)
+            // Browsers send line breaks as CRLF, which would count twice against the comment's length limit
+            model.Name = model.Name?.Trim();
+            model.Email = model.Email?.Trim();
+            model.Comment = model.Comment?.Trim().ReplaceLineEndings("\n");
+
+            ModelState.Clear();
+
+            if (!TryValidateModel(model))
             {
-                return RedirectToPage(page, ContactFormStatus.Invalid);
+                return KeepInputAndRedirect(page, ContactFormStatus.Invalid);
             }
 
             await submissionService.AddAsync(model.Name!, model.Email!, model.Comment!, page.Key, GetCulture());
 
             return RedirectToPage(page, ContactFormStatus.Sent);
+        }
+
+        /// <summary>Keeps what the visitor typed, as they typed it, for the form to show again after the redirect.</summary>
+        private IActionResult KeepInputAndRedirect(IPublishedContent page, string status)
+        {
+            string? Field(string name) => Request.HasFormContentType ? Request.Form[name].ToString() : null;
+
+            ContactFormTempData.Keep(TempData, Field("name"), Field("email"), Field("comment"));
+
+            return RedirectToPage(page, status);
         }
 
         /// <summary>
