@@ -5,7 +5,8 @@ namespace Umbraco26.Business.Data
 {
     /// <summary>
     /// Used by <c>dotnet ef</c> only, so migrations can be generated without booting Umbraco. The site runs on
-    /// SQLite, so the migrations are generated for SQLite. At runtime the context uses the Umbraco connection
+    /// SQLite, so the migrations are generated for SQLite; moving to SQL Server needs its own migration (for
+    /// example a separate migrations assembly per provider). At runtime the context uses the Umbraco connection
     /// string and provider (see <c>ContactFormComposer</c>).
     /// </summary>
     public class ContactFormDbContextFactory : IDesignTimeDbContextFactory<ContactFormDbContext>
