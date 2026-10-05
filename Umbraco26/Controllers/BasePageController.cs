@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Cms.Web.Common.PublishedModels;
 using Umbraco26.Models;
 
 namespace Umbraco26.Controllers
@@ -12,7 +12,7 @@ namespace Umbraco26.Controllers
     /// </summary>
     public abstract class BasePageController<TContent, TViewModel>(PageControllerDependencies dependencies)
         : RenderController(dependencies.Logger, dependencies.ViewEngine, dependencies.UmbracoContextAccessor)
-        where TContent : class, IBase
+        where TContent : class, IPublishedContent
         where TViewModel : PageViewModel<TContent>
     {
         protected PageControllerDependencies Dependencies { get; } = dependencies;
@@ -37,7 +37,7 @@ namespace Umbraco26.Controllers
             return CurrentTemplate(model);
         }
 
-        private string GetUrlSegment(IBase content)
+        private string GetUrlSegment(IPublishedContent content)
         {
             string culture = Dependencies.VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
             bool isDraft = Dependencies.UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext)
