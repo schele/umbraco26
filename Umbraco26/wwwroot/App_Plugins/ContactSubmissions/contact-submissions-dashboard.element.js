@@ -11,6 +11,10 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 const PAGE_SIZE = 20;
 const API_PATH = '/umbraco/contact-submissions/api/v1/submissions';
 
+// An address with any of these could add recipients, a subject or a body to a mailto: link, so it is
+// shown as text instead. The server already refuses such addresses; this guards older rows too.
+const MAILTO_UNSAFE = /[?&%/:=\s]/;
+
 export class ContactSubmissionsDashboardElement extends UmbElementMixin(LitElement) {
     static properties = {
         _items: { state: true },
@@ -82,6 +86,14 @@ export class ContactSubmissionsDashboardElement extends UmbElementMixin(LitEleme
         this.#load();
     }
 
+    #renderEmail(email) {
+        if (!email) {
+            return html`<span class="muted">Can't be decrypted</span>`;
+        }
+
+        return MAILTO_UNSAFE.test(email) ? email : html`<a href="mailto:${email}">${email}</a>`;
+    }
+
     #formatDate(value) {
         return this.localize.date(value, { dateStyle: 'medium', timeStyle: 'short' });
     }
@@ -122,11 +134,7 @@ export class ContactSubmissionsDashboardElement extends UmbElementMixin(LitEleme
                         <uui-table-row>
                             <uui-table-cell class="date">${this.#formatDate(item.createdUtc)}</uui-table-cell>
                             <uui-table-cell>${item.name}</uui-table-cell>
-                            <uui-table-cell>
-                                ${item.email
-                                    ? html`<a href="mailto:${item.email}">${item.email}</a>`
-                                    : html`<span class="muted">Can't be decrypted</span>`}
-                            </uui-table-cell>
+                            <uui-table-cell>${this.#renderEmail(item.email)}</uui-table-cell>
                             <uui-table-cell class="comment">${item.comment}</uui-table-cell>
                             <uui-table-cell>
                                 ${item.pageName ?? html`<span class="muted">Deleted page</span>`}

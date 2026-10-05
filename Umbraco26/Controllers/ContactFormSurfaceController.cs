@@ -77,7 +77,7 @@ namespace Umbraco26.Controllers
 
             ModelState.Clear();
 
-            if (!TryValidateModel(model))
+            if (!TryValidateModel(model) || !ContactFormModel.IsPlainEmailAddress(model.Email))
             {
                 return KeepInputAndRedirect(page, ContactFormStatus.Invalid);
             }
