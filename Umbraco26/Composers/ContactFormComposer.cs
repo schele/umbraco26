@@ -20,6 +20,7 @@ namespace Umbraco26.Composers
                 shareUmbracoConnection: true);
 
             builder.Services.TryAddSingleton(TimeProvider.System);
+            builder.Services.AddSingleton<IContactFormTokenService, ContactFormTokenService>();
             builder.Services.AddSingleton<ContactSubmissionEmailProtector>();
             builder.Services.AddScoped<IContactSubmissionService, ContactSubmissionService>();
 

@@ -1,0 +1,79 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@using Umbraco26.Business.Services.Interfaces
+@using Umbraco26.Controllers
+@using Umbraco26.Models
+
+@inherits UmbracoViewPage<BlockListItem<ContactFormBlock>>
+
+@inject IContactFormTokenService TokenService
+
+@{
+	string Text(string key, string defaultValue) => Umbraco.GetDictionaryValueOrDefault(key, defaultValue);
+
+	var page = Umbraco.AssignedContentItem;
+	var idPrefix = $"contact-{Model.ContentKey:N}";
+	var hasHeading = !string.IsNullOrWhiteSpace(Model.Content.Heading);
+	var status = Context.Request.Query[ContactFormStatus.QueryKey].ToString();
+
+	// Set by ContactFormSurfaceController when it redirects back here after a post
+	(string Color, string Icon, string Role, string Message)? alert = status switch
+	{
+		ContactFormStatus.Sent => ("success", "fa-circle-check", "status", Text("ContactForm.Sent", "Thanks! We have received your message.")),
+		ContactFormStatus.Invalid => ("danger", "fa-circle-exclamation", "alert", Text("ContactForm.Invalid", "Please fill in every field and use a valid email address.")),
+		ContactFormStatus.Expired => ("warning", "fa-clock", "alert", Text("ContactForm.Expired", "The form expired. Please try again.")),
+		_ => null,
+	};
+}
+
+<section id="@ContactFormStatus.Anchor" class="card border-0 shadow-sm mb-4" aria-labelledby="@(hasHeading ? $"{idPrefix}-heading" : null)">
+	<div class="card-body p-4 p-lg-5">
+		@if (hasHeading)
+		{
+			<h2 id="@idPrefix-heading" class="h3 mb-2">@Model.Content.Heading</h2>
+		}
+
+		@if (!string.IsNullOrWhiteSpace(Model.Content.Intro))
+		{
+			<p class="text-body-secondary mb-4">@Model.Content.Intro</p>
+		}
+
+		@if (alert is { } message)
+		{
+			<div class="alert alert-@message.Color d-flex align-items-center" role="@message.Role">
+				<i class="fas @message.Icon me-2" aria-hidden="true"></i>@message.Message
+			</div>
+		}
+
+		@using (Html.BeginUmbracoForm<ContactFormSurfaceController>(nameof(ContactFormSurfaceController.Submit), null, new { @class = "contact-form" }))
+		{
+			@* Signed page key and render time: checked for tampering, expiry and bot-like speed *@
+			<input type="hidden" name="formToken" value="@TokenService.CreateToken(page.Key)" />
+
+			<div class="mb-3">
+				<label for="@idPrefix-name" class="form-label">@Text("ContactForm.Name", "Name")</label>
+				<input id="@idPrefix-name" name="name" type="text" class="form-control" required
+					   maxlength="@ContactSubmission.NameMaxLength" autocomplete="name" />
+			</div>
+
+			<div class="mb-3">
+				<label for="@idPrefix-email" class="form-label">@Text("ContactForm.Email", "Email")</label>
+				<input id="@idPrefix-email" name="email" type="email" class="form-control" required
+					   maxlength="@ContactSubmission.EmailMaxLength" autocomplete="email" />
+			</div>
+
+			<div class="mb-4">
+				<label for="@idPrefix-comment" class="form-label">@Text("ContactForm.Comment", "Comment")</label>
+				<textarea id="@idPrefix-comment" name="comment" class="form-control" rows="5" required
+						  maxlength="@ContactSubmission.CommentMaxLength"></textarea>
+			</div>
+
+			@* Honeypot: off screen instead of display:none, so bots that skip hidden fields still fill it in *@
+			<div class="contact-form-hp" aria-hidden="true">
+				<label for="@idPrefix-website">@Text("ContactForm.Honeypot", "Leave this field empty")</label>
+				<input id="@idPrefix-website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+			</div>
+
+			<button type="submit" class="btn btn-warning fw-semibold px-4">@Text("ContactForm.Send", "Send")</button>
+		}
+	</div>
+</section>
