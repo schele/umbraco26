@@ -9,7 +9,8 @@ namespace Umbraco26.Business.Migrations
         {
             From(string.Empty)
                 .To<AddFindDictionaryItems>("add-find-dictionary-items")
-                .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items");
+                .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items")
+                .To<AddContactFormBlock>("add-contact-form-block");
         }
     }
 }
