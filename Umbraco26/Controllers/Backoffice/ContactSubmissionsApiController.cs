@@ -26,6 +26,7 @@ namespace Umbraco26.Controllers.Backoffice
     [Authorize(Policy = ContactSubmissionsAccessRequirement.PolicyName)]
     [MapToApi(ContactFormComposer.ApiName)]
     [ApiExplorerSettings(GroupName = "Contact submissions")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)] // Personal data: keep it out of every cache
     public class ContactSubmissionsApiController(
         IContactSubmissionService submissionService,
         ContactSubmissionEmailProtector emailProtector,
