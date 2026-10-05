@@ -1,0 +1,9 @@
+/* The contact form's honeypot: moved off screen rather than display:none, so bots that skip hidden fields still fill it in */
+.contact-form-hp {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}

@@ -1,0 +1,26 @@
+{
+  "id": "umbraco26.contact-submissions",
+  "name": "Contact Submissions",
+  "version": "1.0.0",
+  "allowTelemetry": false,
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "Umbraco26.Dashboard.ContactSubmissions",
+      "name": "Contact Submissions Dashboard",
+      "element": "/App_Plugins/ContactSubmissions/contact-submissions-dashboard.element.js",
+      "elementName": "umbraco26-contact-submissions-dashboard",
+      "weight": -10,
+      "meta": {
+        "label": "Contact submissions",
+        "pathname": "contact-submissions"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Content"
+        }
+      ]
+    }
+  ]
+}

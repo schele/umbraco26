@@ -1,14 +1,15 @@
-﻿using Umbraco.Cms.Web.Common.PublishedModels;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.PublishedModels;
 
 namespace Umbraco26.Models
 {
     /// <summary>
     /// The page-level surface shared by every view model, so layouts can bind to
-    /// this instead of to <see cref="IBase"/> directly.
+    /// this instead of to the page's content model directly.
     /// </summary>
     public interface IPageViewModel
     {
-        IBase Content { get; }
+        IPublishedContent Content { get; }
 
         Start? StartPage { get; }
 

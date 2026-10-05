@@ -475,6 +475,9 @@ umbraco-package-schema.json
 /umbraco/Data/*.sqlite.db-shm
 /umbraco/Data/*.sqlite.db-wal
 
+# ASP.NET Core Data Protection key ring (see Program.cs); environment specific and secret
+/umbraco/Data/DataProtection-Keys/
+
 # Hangfire SQLite job storage
 /umbraco/Data/Hangfire.db
 /umbraco/Data/Hangfire.db-shm
