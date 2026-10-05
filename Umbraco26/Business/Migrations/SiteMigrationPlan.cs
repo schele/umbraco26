@@ -8,7 +8,8 @@ namespace Umbraco26.Business.Migrations
         public SiteMigrationPlan() : base("Umbraco26")
         {
             From(string.Empty)
-                .To<AddFindDictionaryItems>("add-find-dictionary-items");
+                .To<AddFindDictionaryItems>("add-find-dictionary-items")
+                .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items");
         }
     }
 }
