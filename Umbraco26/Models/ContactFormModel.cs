@@ -28,6 +28,9 @@ namespace Umbraco26.Models
         /// <summary>Signed page key and render time, see <c>IContactFormTokenService</c>.</summary>
         public string? FormToken { get; set; }
 
+        /// <summary>The reCAPTCHA v3 token the page fetches as the form is sent, see <c>IReCaptchaService</c>.</summary>
+        public string? ReCaptchaToken { get; set; }
+
         /// <summary>
         /// Stricter than <see cref="EmailAddressAttribute"/>: a plain address (no display name or other extras)
         /// that is safe to put in a <c>mailto:</c> link, so <c>boss%40firm.se?cc=someone@example.com</c> is refused.

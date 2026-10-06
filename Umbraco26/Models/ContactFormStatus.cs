@@ -12,5 +12,8 @@ namespace Umbraco26.Models
         public const string Sent = "sent";
         public const string Invalid = "invalid";
         public const string Expired = "expired";
+
+        /// <summary>reCAPTCHA didn't think a person sent it, or couldn't run in the visitor's browser.</summary>
+        public const string Unverified = "unverified";
     }
 }
