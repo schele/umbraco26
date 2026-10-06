@@ -16,7 +16,6 @@ namespace Umbraco26.Controllers
             return new()
             {
                 Content = page,
-                Carousel = BuildCarousel(roots),
                 MoviePageUrl = roots.DescendantsOrSelf<Movie>().FirstOrDefault()?.Url(),
             };
         }
@@ -34,19 +33,6 @@ namespace Umbraco26.Controllers
                 .Select(key => umbracoContext.Content.GetById(key))
                 .OfType<IPublishedContent>()
                 .ToList();
-        }
-
-        /// <summary>Builds the carousel from the Carousel pages under the first Carousel Container in the content tree.</summary>
-        private static CarouselViewModel? BuildCarousel(List<IPublishedContent> roots)
-        {
-            CarouselContainer? container = roots.DescendantsOrSelf<CarouselContainer>().FirstOrDefault();
-
-            List<CarouselSlide> slides = container?.Children<Carousel>()?
-                .Where(slide => slide.Image != null)
-                .Select(slide => new CarouselSlide(slide.Image!, slide.Name))
-                .ToList() ?? [];
-
-            return slides.Count == 0 ? null : new CarouselViewModel { Id = $"carousel-{container!.Key:N}", Slides = slides };
         }
     }
 }
