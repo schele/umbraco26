@@ -12,7 +12,9 @@ namespace Umbraco26.Business.Migrations
                 .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items")
                 .To<AddContactFormBlock>("add-contact-form-block")
                 // Adds the contact form texts that came after the first step; existing items are kept
-                .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items-2");
+                .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items-2")
+                // Adds the menu's search link text; existing items are kept
+                .To<AddFindDictionaryItems>("add-find-dictionary-items-2");
         }
     }
 }
