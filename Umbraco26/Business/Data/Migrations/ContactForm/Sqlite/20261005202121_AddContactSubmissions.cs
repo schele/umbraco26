@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Umbraco26.Business.Data.Migrations.ContactForm
+namespace Umbraco26.Business.Data.Migrations.ContactForm.Sqlite
 {
     /// <inheritdoc />
     public partial class AddContactSubmissions : Migration

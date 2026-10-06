@@ -8,12 +8,13 @@ using Umbraco26.Business.Data;
 namespace Umbraco26.Business.Notifications
 {
     /// <summary>
-    /// Applies pending <see cref="ContactFormDbContext"/> migrations when Umbraco has started. The migrations
-    /// are generated for SQLite, which this site runs on; running on SQL Server needs its own migration.
+    /// Applies pending <see cref="ContactFormDbContext"/> migrations when Umbraco has started, using the set for the
+    /// database provider Umbraco runs on (see <see cref="SqliteContactFormDbContext"/>).
     /// </summary>
     public class ContactFormMigrationHandler(
         IRuntimeState runtimeState,
         IDbContextFactory<ContactFormDbContext> contextFactory,
+        DbContextOptions<ContactFormDbContext> options,
         ILogger<ContactFormMigrationHandler> logger)
         : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
     {
@@ -28,7 +29,11 @@ namespace Umbraco26.Business.Notifications
             // A failure here must not stop the site, nor the other startup handlers, from starting
             try
             {
-                await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+                await using var siteContext = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+                await using ContactFormDbContext context = siteContext.Database.IsSqlServer()
+                    ? new SqlServerContactFormDbContext(options)
+                    : new SqliteContactFormDbContext(options);
 
                 var pending = (await context.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
 

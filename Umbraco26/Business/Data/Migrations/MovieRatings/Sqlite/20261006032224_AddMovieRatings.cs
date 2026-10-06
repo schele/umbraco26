@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Umbraco26.Business.Data.Migrations
+namespace Umbraco26.Business.Data.Migrations.MovieRatings.Sqlite
 {
     /// <inheritdoc />
     public partial class AddMovieRatings : Migration
@@ -15,12 +15,12 @@ namespace Umbraco26.Business.Data.Migrations
                 name: "movieFinderRating",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ImdbId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Score = table.Column<double>(type: "float", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Comment = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    CreatedUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ImdbId = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Score = table.Column<double>(type: "REAL", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Comment = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    CreatedUtc = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
