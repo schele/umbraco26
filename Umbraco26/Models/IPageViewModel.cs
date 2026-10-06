@@ -13,6 +13,9 @@ namespace Umbraco26.Models
 
         Start? StartPage { get; }
 
+        /// <summary>The find page the menu's search link goes to, or <c>null</c> when there is none to link to.</summary>
+        string? FindPageUrl { get; }
+
         string UrlSegment { get; }
 
         string PageTitle { get; }

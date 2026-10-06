@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbraco26.Business.Data;
 
 #nullable disable
 
-namespace Umbraco26.Business.Data.Migrations
+namespace Umbraco26.Business.Data.Migrations.MovieRatings.SqlServer
 {
-    [DbContext(typeof(MovieRatingContext))]
-    [Migration("20261001083906_AddMovieRatings")]
-    partial class AddMovieRatings
+    [DbContext(typeof(SqlServerMovieRatingContext))]
+    partial class SqlServerMovieRatingContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -8,11 +8,11 @@ using Umbraco26.Business.Data;
 
 #nullable disable
 
-namespace Umbraco26.Business.Data.Migrations.ContactForm
+namespace Umbraco26.Business.Data.Migrations.MovieRatings.Sqlite
 {
-    [DbContext(typeof(ContactFormDbContext))]
-    [Migration("20261005202121_AddContactSubmissions")]
-    partial class AddContactSubmissions
+    [DbContext(typeof(SqliteMovieRatingContext))]
+    [Migration("20261006032224_AddMovieRatings")]
+    partial class AddMovieRatings
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,42 +20,36 @@ namespace Umbraco26.Business.Data.Migrations.ContactForm
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.10");
 
-            modelBuilder.Entity("Umbraco26.Models.ContactSubmission", b =>
+            modelBuilder.Entity("Umbraco26.Models.MovieRating", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Culture")
+                    b.Property<string>("ImdbId")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EmailProtected")
-                        .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("PageKey")
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Score")
+                        .HasColumnType("REAL");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedUtc");
+                    b.HasIndex("ImdbId");
 
-                    b.ToTable("contactSubmission", (string)null);
+                    b.ToTable("movieFinderRating", (string)null);
                 });
 #pragma warning restore 612, 618
         }

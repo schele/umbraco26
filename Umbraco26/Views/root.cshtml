@@ -28,6 +28,17 @@
 				<a class="navbar-brand fw-semibold" href="/">
 					<i class="fas fa-film me-2 text-warning"></i>Movie Finder
 				</a>
+				@if (Model.FindPageUrl is string findPageUrl)
+				{
+					@* Inside navbar-nav, so the link gets the navbar's light text colour *@
+					<ul class="navbar-nav ms-auto">
+						<li class="nav-item">
+							<a class="nav-link" href="@findPageUrl">
+								<i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>@Umbraco.GetDictionaryValueOrDefault("Find.NavLink", "Search")
+							</a>
+						</li>
+					</ul>
+				}
 			</div>
 		</nav>
 

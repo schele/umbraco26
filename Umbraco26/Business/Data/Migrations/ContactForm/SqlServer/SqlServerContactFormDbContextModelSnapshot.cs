@@ -8,10 +8,10 @@ using Umbraco26.Business.Data;
 
 #nullable disable
 
-namespace Umbraco26.Business.Data.Migrations
+namespace Umbraco26.Business.Data.Migrations.ContactForm.SqlServer
 {
-    [DbContext(typeof(MovieRatingContext))]
-    partial class MovieRatingContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SqlServerContactFormDbContext))]
+    partial class SqlServerContactFormDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -22,36 +22,44 @@ namespace Umbraco26.Business.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Umbraco26.Models.MovieRating", b =>
+            modelBuilder.Entity("Umbraco26.Models.ContactSubmission", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Comment")
+                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ImdbId")
+                    b.Property<string>("Culture")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("EmailProtected")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<double>("Score")
-                        .HasColumnType("float");
+                    b.Property<Guid>("PageKey")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ImdbId");
+                    b.HasIndex("CreatedUtc");
 
-                    b.ToTable("movieFinderRating", (string)null);
+                    b.ToTable("contactSubmission", (string)null);
                 });
 #pragma warning restore 612, 618
         }

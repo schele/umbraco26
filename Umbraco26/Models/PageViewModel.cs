@@ -11,6 +11,9 @@ namespace Umbraco26.Models
 
         public Start? StartPage => Content.AncestorOrSelf<Start>();
 
+        /// <summary>The first find page under the start page that is published in the current culture, so visitors are never sent to a 404.</summary>
+        public string? FindPageUrl => StartPage?.FirstChild<Find>()?.Url();
+
         public virtual string PageTitle => Content.Name;
 
         /// <summary>Pages without the <c>base</c> composition (such as Article) have no meta description.</summary>

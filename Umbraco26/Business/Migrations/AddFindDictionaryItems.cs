@@ -24,6 +24,7 @@ namespace Umbraco26.Business.Migrations
             ("Find.Previous", "Föregående", "Previous"),
             ("Find.Next", "Nästa", "Next"),
             ("Find.StartTyping", "Skriv vad du letar efter ovan för att söka.", "Type what you're looking for above to search."),
+            ("Find.NavLink", "Sök", "Search"),
         ];
     }
 }
