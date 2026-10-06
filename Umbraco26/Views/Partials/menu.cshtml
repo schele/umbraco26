@@ -1,0 +1,48 @@
+@using Umbraco26.Models
+
+@inherits UmbracoViewPage<IPageViewModel>
+
+@{
+	var current = Model.Content;
+	var currentPath = current.Path.Split(',');
+
+	// The start page is every page's ancestor, so it is only current on itself; other items also on the pages below them
+	bool IsCurrent(IPublishedContent item) =>
+		item.Id == current.Id || (item.Id != Model.StartPage?.Id && currentPath.Contains(item.Id.ToString()));
+}
+
+<nav class="navbar navbar-expand-lg bg-dark border-bottom border-body site-menu" data-bs-theme="dark" aria-label="@Umbraco.GetDictionaryValueOrDefault("Menu.Label", "Main menu")">
+	<div class="container">
+		<a class="navbar-brand fw-semibold" href="/">
+			<i class="fas fa-film me-2 text-warning"></i>Movie Finder
+		</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu-items"
+				aria-controls="site-menu-items" aria-expanded="false" aria-label="@Umbraco.GetDictionaryValueOrDefault("Menu.Toggle", "Show or hide the menu")">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="site-menu-items">
+			<ul class="navbar-nav me-auto">
+				@foreach (var item in Model.MenuItems)
+				{
+					var isCurrent = IsCurrent(item);
+
+					<li class="nav-item">
+						<a class="nav-link@(isCurrent ? " active" : null)" href="@item.Url()" aria-current="@(isCurrent ? "page" : null)">@item.Name</a>
+					</li>
+				}
+			</ul>
+			@if (Model.FindPageUrl is string findPageUrl)
+			{
+				var isFind = current is Find;
+
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link@(isFind ? " active" : null)" href="@findPageUrl" aria-current="@(isFind ? "page" : null)">
+							<i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>@Umbraco.GetDictionaryValueOrDefault("Find.NavLink", "Search")
+						</a>
+					</li>
+				</ul>
+			}
+		</div>
+	</div>
+</nav>

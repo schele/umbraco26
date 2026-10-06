@@ -14,7 +14,7 @@ namespace Umbraco26.Business.Services
 	public class FindService : IFindService
 	{
 		/// <summary>Pages that exist in the tree but aren't useful as search results.</summary>
-		private static readonly string[] ExcludedContentTypes = [Error.ModelTypeAlias, Sitemap.ModelTypeAlias];
+		private static readonly string[] ExcludedContentTypes = [Error.ModelTypeAlias, Sitemap.ModelTypeAlias, Settings.ModelTypeAlias];
 
 		private readonly IExamineManager _examineManager;
 		private readonly IUmbracoContextFactory _umbracoContextFactory;

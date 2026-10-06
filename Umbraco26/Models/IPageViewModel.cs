@@ -16,6 +16,9 @@ namespace Umbraco26.Models
         /// <summary>The find page the menu's search link goes to, or <c>null</c> when there is none to link to.</summary>
         string? FindPageUrl { get; }
 
+        /// <summary>The pages in the top menu, in the order editors picked them on the settings page.</summary>
+        IReadOnlyList<IPublishedContent> MenuItems { get; }
+
         string UrlSegment { get; }
 
         string PageTitle { get; }

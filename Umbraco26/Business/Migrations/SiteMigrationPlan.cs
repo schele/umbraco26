@@ -14,7 +14,9 @@ namespace Umbraco26.Business.Migrations
                 // Adds the contact form texts that came after the first step; existing items are kept
                 .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items-2")
                 // Adds the menu's search link text; existing items are kept
-                .To<AddFindDictionaryItems>("add-find-dictionary-items-2");
+                .To<AddFindDictionaryItems>("add-find-dictionary-items-2")
+                .To<AddSettingsPage>("add-settings-page")
+                .To<AddMenuDictionaryItems>("add-menu-dictionary-items");
         }
     }
 }
