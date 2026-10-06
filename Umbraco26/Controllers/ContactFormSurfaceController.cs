@@ -30,6 +30,7 @@ namespace Umbraco26.Controllers
         IAntiforgery antiforgery,
         IContactFormTokenService tokenService,
         IContactSubmissionService submissionService,
+        IReCaptchaService reCaptchaService,
         ILogger<ContactFormSurfaceController> logger)
         : SurfaceController(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
     {
@@ -80,6 +81,15 @@ namespace Umbraco26.Controllers
             if (!TryValidateModel(model) || !ContactFormModel.IsPlainEmailAddress(model.Email))
             {
                 return KeepInputAndRedirect(page, ContactFormStatus.Invalid);
+            }
+
+            // Last, so Google is only asked about posts that would otherwise be stored
+            if (reCaptchaService.IsEnabled
+                && await reCaptchaService.VerifyAsync(model.ReCaptchaToken, IReCaptchaService.ContactAction, HttpContext.RequestAborted) == ReCaptchaStatus.Failed)
+            {
+                // Told rather than silently dropped like the honeypot, as a low score can be a person
+                logger.LogInformation("Contact form on page {PageKey} failed the reCAPTCHA check; nothing was stored.", page.Key);
+                return KeepInputAndRedirect(page, ContactFormStatus.Unverified);
             }
 
             await submissionService.AddAsync(model.Name!, model.Email!, model.Comment!, page.Key, GetCulture());

@@ -6,6 +6,7 @@
 @inherits UmbracoViewPage<BlockListItem<ContactFormBlock>>
 
 @inject IContactFormTokenService TokenService
+@inject IReCaptchaService ReCaptcha
 
 @{
 	string Text(string key, string defaultValue) => Umbraco.GetDictionaryValueOrDefault(key, defaultValue);
@@ -23,11 +24,20 @@
 		ContactFormStatus.Sent => ("success", "fa-circle-check", "status", Text("ContactForm.Sent", "Thanks! We have received your message.")),
 		ContactFormStatus.Invalid => ("danger", "fa-circle-exclamation", "alert", Text("ContactForm.Invalid", "Please fill in every field and use a valid email address.")),
 		ContactFormStatus.Expired => ("warning", "fa-clock", "alert", Text("ContactForm.Expired", "The form expired. Please try again.")),
+		ContactFormStatus.Unverified => ("warning", "fa-shield-halved", "alert", Text("ContactForm.Unverified", "We couldn't confirm that a person sent the message. Check that nothing in your browser blocks Google's reCAPTCHA and try again.")),
 		_ => null,
 	};
 
 	// What the visitor typed before an invalid or expired post, so they don't have to type it again
 	var input = ContactFormTempData.Take(TempData);
+
+	// contact-form.js fetches a reCAPTCHA token for forms with a site key, as they are sent
+	var formAttributes = new Dictionary<string, object?> { ["class"] = "contact-form" };
+
+	if (ReCaptcha.IsEnabled)
+	{
+		formAttributes["data-recaptcha-site-key"] = ReCaptcha.SiteKey;
+	}
 }
 
 <section id="@ContactFormStatus.Anchor" class="card border-0 shadow-sm mb-4" aria-labelledby="@(hasHeading ? $"{idPrefix}-heading" : null)">
@@ -57,7 +67,7 @@
 		}
 		else
 		{
-			using (Html.BeginUmbracoForm<ContactFormSurfaceController>(nameof(ContactFormSurfaceController.Submit), null, new { @class = "contact-form" }))
+			using (Html.BeginUmbracoForm<ContactFormSurfaceController>(nameof(ContactFormSurfaceController.Submit), null, formAttributes))
 			{
 				@* Signed page key and render time: checked for tampering, expiry and bot-like speed *@
 				<input type="hidden" name="formToken" value="@TokenService.CreateToken(currentPage.Key)" />
@@ -88,8 +98,27 @@
 					<input id="@idPrefix-website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
 				</div>
 
-				<button type="submit" class="btn btn-warning fw-semibold px-4">@Text("ContactForm.Send", "Send")</button>
+				@* contact-form.js shows the spinner and the sending text while the form is sent *@
+				<button type="submit" class="btn btn-warning fw-semibold px-4">
+					<span class="spinner-border spinner-border-sm me-2" aria-hidden="true" hidden></span>
+					<span data-sending-text="@Text("ContactForm.Sending", "Sending…")">@Text("ContactForm.Send", "Send")</span>
+				</button>
+
+				if (ReCaptcha.IsEnabled)
+				{
+					<input type="hidden" name="reCaptchaToken" />
+
+					// Google lets sites hide the reCAPTCHA badge (see contact.css) as long as this notice is shown instead
+					var privacy = $"<a href=\"https://policies.google.com/privacy\" class=\"link-secondary\" target=\"_blank\" rel=\"noopener\">{Html.Encode(Text("ContactForm.ReCaptchaPrivacy", "Privacy Policy"))}</a>";
+					var terms = $"<a href=\"https://policies.google.com/terms\" class=\"link-secondary\" target=\"_blank\" rel=\"noopener\">{Html.Encode(Text("ContactForm.ReCaptchaTerms", "Terms of Service"))}</a>";
+					var notice = Html.Encode(Text("ContactForm.ReCaptchaNotice", "This form is protected by reCAPTCHA, and the Google {0} and {1} apply."));
+
+					@* Replace rather than string.Format, so a stray brace in an editor's translation can't break the page *@
+					<p class="small text-body-secondary mt-3 mb-0">@Html.Raw(notice.Replace("{0}", privacy).Replace("{1}", terms))</p>
+				}
 			}
+
+			<script src="~/js/contact-form.js" asp-append-version="true" defer></script>
 		}
 	</div>
 </section>

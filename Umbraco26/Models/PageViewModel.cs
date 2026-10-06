@@ -14,6 +14,10 @@ namespace Umbraco26.Models
         /// <summary>The first find page under the start page that is published in the current culture, so visitors are never sent to a 404.</summary>
         public string? FindPageUrl => StartPage?.FirstChild<Find>()?.Url();
 
+        /// <summary>The pages picked on the start page's settings page, without those not published in the current culture.</summary>
+        public IReadOnlyList<IPublishedContent> MenuItems
+            => StartPage?.FirstChild<Settings>()?.MenuItems?.Where(page => page.IsPublished()).ToList() ?? [];
+
         public virtual string PageTitle => Content.Name;
 
         /// <summary>Pages without the <c>base</c> composition (such as Article) have no meta description.</summary>

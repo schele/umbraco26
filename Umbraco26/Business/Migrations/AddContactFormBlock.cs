@@ -19,7 +19,8 @@ namespace Umbraco26.Business.Migrations
     /// Runs unscoped, i.e. with notifications, unlike scoped migrations: creating and publishing content needs
     /// them to update URLs, navigation and the published cache, and they make ModelsBuilder regenerate models.
     /// The work still happens in a single scope, so a failure rolls everything back and the step runs again.
-    /// The element type is invariant because Article is: block level variance needs a culture-variant document.
+    /// The element type and the <c>blocks</c> property are invariant, so they work whether or not Article varies by
+    /// culture. When it does, the Contact page is named in every language, as a culture-variant page can't be saved without.
     /// </remarks>
     public class AddContactFormBlock(
         IMigrationContext context,
@@ -28,6 +29,7 @@ namespace Umbraco26.Business.Migrations
         IDataTypeService dataTypeService,
         ITemplateService templateService,
         IContentService contentService,
+        ILanguageService languageService,
         PropertyEditorCollection propertyEditors,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
         IShortStringHelper shortStringHelper,
@@ -58,7 +60,7 @@ namespace Umbraco26.Business.Migrations
                 var dataType = await EnsureDataTypeAsync(elementType);
                 var articleType = await EnsureArticleTypeAsync(dataType);
                 await EnsureArticleAllowedUnderStartAsync(articleType);
-                EnsureContactPage(articleType, elementType);
+                await EnsureContactPageAsync(articleType, elementType);
 
                 scope.Complete();
             }
@@ -229,7 +231,7 @@ namespace Umbraco26.Business.Migrations
             }
         }
 
-        private void EnsureContactPage(IContentType articleType, IContentType elementType)
+        private async Task EnsureContactPageAsync(IContentType articleType, IContentType elementType)
         {
             var start = contentService.GetRootContent().FirstOrDefault(x => x.ContentType.Alias == StartTypeAlias);
 
@@ -257,6 +259,14 @@ namespace Umbraco26.Business.Migrations
             }
 
             contact ??= contentService.Create(ContactPageName, start.Key, articleType.Alias);
+
+            if (articleType.VariesByCulture())
+            {
+                foreach (var language in await languageService.GetAllAsync())
+                {
+                    contact.SetCultureName(contact.GetCultureName(language.IsoCode) ?? ContactPageName, language.IsoCode);
+                }
+            }
             contact.SetValue(BlocksPropertyAlias, CreateBlocksValue(elementType.Key));
 
             var saved = contentService.Save(contact);

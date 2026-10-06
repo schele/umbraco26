@@ -32,6 +32,10 @@ namespace Umbraco26.Composers
             builder.Services.AddSingleton<ContactSubmissionEmailProtector>();
             builder.Services.AddScoped<IContactSubmissionService, ContactSubmissionService>();
 
+            builder.Services.AddOptions<ReCaptchaOptions>().Bind(builder.Config.GetSection(ReCaptchaOptions.SectionName));
+            // A short timeout: if Google is slow the post is let through rather than kept waiting
+            builder.Services.AddHttpClient<IReCaptchaService, ReCaptchaService>(client => client.Timeout = TimeSpan.FromSeconds(5));
+
             builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, ContactFormMigrationHandler>();
 
             builder.Services.AddAuthorization(options => options.AddPolicy(ContactSubmissionsAccessRequirement.PolicyName, policy =>
