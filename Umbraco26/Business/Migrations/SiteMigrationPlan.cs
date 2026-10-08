@@ -20,7 +20,9 @@ namespace Umbraco26.Business.Migrations
                 // Adds the reCAPTCHA texts; existing items are kept
                 .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items-3")
                 // Adds the send button's sending text; existing items are kept
-                .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items-4");
+                .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items-4")
+                .To<AddMemberPages>("add-member-pages")
+                .To<AddMemberDictionaryItems>("add-member-dictionary-items");
         }
     }
 }

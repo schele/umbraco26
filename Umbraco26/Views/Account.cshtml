@@ -1,0 +1,79 @@
+﻿@using Umbraco.Cms.Web.Website.Controllers
+@using Umbraco26.Business.Security
+@using Umbraco26.Models.ViewModels
+
+@inherits UmbracoViewPage<AccountPageViewModel>
+
+@{
+	Layout = "root.cshtml";
+
+	string Text(string key, string defaultValue) => Umbraco.GetDictionaryValueOrDefault(key, defaultValue);
+
+	// Set by Umbraco's two-factor controller when the code didn't match the scanned QR code
+	var codeInvalid = !ViewData.ModelState.IsValid;
+}
+
+<div class="container py-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8 col-lg-6">
+			<h1 class="display-6 fw-bold mb-2">@Model.Content.Name</h1>
+			<p class="text-body-secondary mb-4">@Text("Member.LoggedInAs", "Logged in as") <strong>@Model.MemberName</strong></p>
+
+			<section class="card border-0 shadow-sm mb-4" aria-labelledby="two-factor-heading">
+				<div class="card-body p-4">
+					<h2 id="two-factor-heading" class="h4 mb-3">
+						<i class="fas fa-shield-halved me-2 text-success" aria-hidden="true"></i>@Text("Member.TwoFactorHeading", "Two-factor authentication")
+					</h2>
+
+					@if (Model.TwoFactorEnabled)
+					{
+						<p>@Text("Member.TwoFactorOn", "Two-factor authentication is on. When you log in, you also enter a code from your authenticator app.")</p>
+
+						using (Html.BeginUmbracoForm<UmbTwoFactorLoginController>(nameof(UmbTwoFactorLoginController.Disable)))
+						{
+							<input type="hidden" name="providerName" value="@UmbracoMemberAppAuthenticator.Name" />
+							<button type="submit" class="btn btn-outline-danger">@Text("Member.TurnOff", "Turn off")</button>
+						}
+					}
+					else if (Model.Setup is { } setup)
+					{
+						<p>@Text("Member.TwoFactorOff", "Protect your account with a code from an authenticator app, such as Google Authenticator or Microsoft Authenticator, when you log in.")</p>
+
+						using (Html.BeginUmbracoForm<UmbTwoFactorLoginController>(nameof(UmbTwoFactorLoginController.ValidateAndSaveSetup)))
+						{
+							<input type="hidden" name="providerName" value="@UmbracoMemberAppAuthenticator.Name" />
+							@* Umbraco checks the code against this secret and saves it when they match *@
+							<input type="hidden" name="secret" value="@setup.Secret" />
+
+							<p class="mb-2">@Text("Member.ScanQrCode", "Scan the QR code with the app and enter the code it shows.")</p>
+							<img src="@setup.QrCodeSetupImageUrl" alt="@Text("Member.QrCodeAlt", "QR code for the authenticator app")"
+								 class="d-block mb-3 border rounded" width="200" height="200" />
+
+							@if (codeInvalid)
+							{
+								<div class="alert alert-danger d-flex align-items-center" role="alert">
+									<i class="fas fa-circle-exclamation me-2" aria-hidden="true"></i>@Text("Member.CodeInvalid", "That code isn't right. Enter the code the app shows right now.")
+								</div>
+							}
+
+							<div class="mb-3">
+								<label for="member-setup-code" class="form-label">@Text("Member.Code", "Code")</label>
+								<input id="member-setup-code" name="code" type="text" class="form-control" required
+									   inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" />
+							</div>
+
+							<button type="submit" class="btn btn-primary">@Text("Member.TurnOn", "Turn on")</button>
+						}
+					}
+				</div>
+			</section>
+
+			@using (Html.BeginUmbracoForm<UmbLoginStatusController>(nameof(UmbLoginStatusController.HandleLogout), new { RedirectUrl = Model.StartPage?.Url() ?? "/" }))
+			{
+				<button type="submit" class="btn btn-outline-secondary">
+					<i class="fas fa-right-from-bracket me-2" aria-hidden="true"></i>@Text("Member.Logout", "Log out")
+				</button>
+			}
+		</div>
+	</div>
+</div>

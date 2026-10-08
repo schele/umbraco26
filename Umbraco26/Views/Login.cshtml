@@ -1,0 +1,81 @@
+﻿@using Umbraco.Cms.Web.Website.Controllers
+@using Umbraco26.Models.ViewModels
+
+@inherits UmbracoViewPage<LoginPageViewModel>
+
+@{
+	Layout = "root.cshtml";
+
+	string Text(string key, string defaultValue) => Umbraco.GetDictionaryValueOrDefault(key, defaultValue);
+
+	// Set by Umbraco's login controller when the password was right and the member has two-factor login turned on,
+	// and again by its two-factor controller after a wrong code
+	var needsCode = ViewData.TryGetTwoFactorProviderNames(out var providerNames);
+	var failed = !ViewData.ModelState.IsValid;
+
+	// Both controllers check that it is a local URL; the login controller reads it from the form's route values
+	object? loginRouteValues = Model.ReturnUrl is null ? null : new { RedirectUrl = Model.ReturnUrl };
+	object? codeRouteValues = Model.ReturnUrl is null ? null : new { returnUrl = Model.ReturnUrl };
+}
+
+<div class="container py-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8 col-lg-5">
+			<h1 class="display-6 fw-bold mb-4">@Model.Content.Name</h1>
+
+			<div class="card border-0 shadow-sm">
+				<div class="card-body p-4">
+					@if (needsCode)
+					{
+						using (Html.BeginUmbracoForm<UmbTwoFactorLoginController>(nameof(UmbTwoFactorLoginController.Verify2FACode), codeRouteValues))
+						{
+							@* Members only have the authenticator app provider *@
+							<input type="hidden" name="provider" value="@providerNames!.First()" />
+
+							<p class="mb-3">@Text("Member.CodeIntro", "Enter the code your authenticator app shows to log in.")</p>
+
+							@if (failed)
+							{
+								<div class="alert alert-danger d-flex align-items-center" role="alert">
+									<i class="fas fa-circle-exclamation me-2" aria-hidden="true"></i>@Text("Member.CodeInvalid", "That code isn't right. Enter the code the app shows right now.")
+								</div>
+							}
+
+							<div class="mb-4">
+								<label for="member-code" class="form-label">@Text("Member.Code", "Code")</label>
+								<input id="member-code" name="code" type="text" class="form-control form-control-lg" required autofocus
+									   inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" />
+							</div>
+
+							<button type="submit" class="btn btn-primary w-100">@Text("Member.Verify", "Verify")</button>
+						}
+					}
+					else
+					{
+						using (Html.BeginUmbracoForm<UmbLoginController>(nameof(UmbLoginController.HandleLogin), loginRouteValues))
+						{
+							@if (failed)
+							{
+								<div class="alert alert-danger d-flex align-items-center" role="alert">
+									<i class="fas fa-circle-exclamation me-2" aria-hidden="true"></i>@Text("Member.LoginFailed", "Wrong username or password, or the account is locked.")
+								</div>
+							}
+
+							<div class="mb-3">
+								<label for="member-username" class="form-label">@Text("Member.Username", "Username")</label>
+								<input id="member-username" name="loginModel.Username" type="text" class="form-control" required autocomplete="username" />
+							</div>
+
+							<div class="mb-4">
+								<label for="member-password" class="form-label">@Text("Member.Password", "Password")</label>
+								<input id="member-password" name="loginModel.Password" type="password" class="form-control" required autocomplete="current-password" />
+							</div>
+
+							<button type="submit" class="btn btn-primary w-100">@Text("Member.LoginButton", "Log in")</button>
+						}
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
