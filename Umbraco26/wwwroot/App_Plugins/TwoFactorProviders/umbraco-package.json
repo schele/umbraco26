@@ -1,0 +1,17 @@
+{
+  "id": "umbraco26.two-factor-providers",
+  "name": "Two-Factor Providers",
+  "version": "1.0.0",
+  "allowTelemetry": false,
+  "extensions": [
+    {
+      "type": "mfaLoginProvider",
+      "alias": "Umbraco26.MfaLoginProvider.UserAppAuthenticator",
+      "name": "Authenticator App Two-Factor Provider",
+      "forProviderName": "UmbracoUserAppAuthenticator",
+      "meta": {
+        "label": "Authenticator app"
+      }
+    }
+  ]
+}
