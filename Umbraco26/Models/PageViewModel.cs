@@ -29,6 +29,10 @@ namespace Umbraco26.Models
         /// <summary>Pages without the <c>base</c> composition (such as Article) have no meta description.</summary>
         public virtual string MetaDescription => (Content as IBase)?.MetaDescription ?? string.Empty;
 
+        /// <summary>NONE when editors chose it; otherwise ALL, also for pages without a value or the <c>base</c> composition.</summary>
+        public virtual string MetaRobots
+            => (Content as IBase)?.MetaRobots == MetaRobotsValues.None ? MetaRobotsValues.None : MetaRobotsValues.All;
+
         /// <summary>Populated by <c>BasePageController</c> when the model is built.</summary>
         public string UrlSegment { get; set; } = string.Empty;
     }

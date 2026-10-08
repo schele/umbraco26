@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.PublishedModels;
 using Umbraco26.Business.Extensions;
 using Umbraco26.Business.Services.Interfaces;
+using Umbraco26.Models;
 using Umbraco26.Models.ViewModels;
 
 namespace Umbraco26.Business.Services
@@ -29,8 +30,9 @@ namespace Umbraco26.Business.Services
 
                     if (startPage != null)
                     {
+                        // Pages without a Meta Robots value count as ALL, so only NONE is left out
                         return startPage.DescendantsOrSelf<IPublishedContent>()
-                            .Where(page => page is IBase basePage && page.IsPublished()).ToList();
+                            .Where(page => page is IBase basePage && basePage.MetaRobots != MetaRobotsValues.None && page.IsPublished()).ToList();
                     }
                 }
             }

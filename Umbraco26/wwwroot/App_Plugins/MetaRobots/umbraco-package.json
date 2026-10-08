@@ -1,0 +1,28 @@
+{
+  "id": "umbraco26.meta-robots",
+  "name": "Meta Robots",
+  "version": "1.0.0",
+  "allowTelemetry": false,
+  "extensions": [
+    {
+      "type": "propertyEditorUi",
+      "alias": "Umbraco26.PropertyEditorUi.MetaRobots",
+      "name": "Meta Robots",
+      "element": "/App_Plugins/MetaRobots/meta-robots.element.js",
+      "elementName": "umbraco26-meta-robots",
+      "meta": {
+        "label": "Meta Robots",
+        "icon": "icon-search",
+        "group": "common",
+        "propertyEditorSchemaAlias": "Umbraco.Plain.String"
+      }
+    },
+    {
+      "type": "propertyValuePreset",
+      "alias": "Umbraco26.PropertyValuePreset.MetaRobots",
+      "name": "Meta Robots Default Value",
+      "api": "/App_Plugins/MetaRobots/meta-robots.preset.js",
+      "forPropertyEditorUiAlias": "Umbraco26.PropertyEditorUi.MetaRobots"
+    }
+  ]
+}
