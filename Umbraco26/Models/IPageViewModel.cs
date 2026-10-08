@@ -30,5 +30,8 @@ namespace Umbraco26.Models
         string PageTitle { get; }
 
         string MetaDescription { get; }
+
+        /// <summary>The page's Meta Robots value for the robots meta tag: <see cref="MetaRobotsValues.All"/> or <see cref="MetaRobotsValues.None"/>.</summary>
+        string MetaRobots { get; }
     }
 }

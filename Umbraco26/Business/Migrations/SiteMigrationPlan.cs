@@ -22,7 +22,8 @@ namespace Umbraco26.Business.Migrations
                 // Adds the send button's sending text; existing items are kept
                 .To<AddContactFormDictionaryItems>("add-contact-form-dictionary-items-4")
                 .To<AddMemberPages>("add-member-pages")
-                .To<AddMemberDictionaryItems>("add-member-dictionary-items");
+                .To<AddMemberDictionaryItems>("add-member-dictionary-items")
+                .To<AddMetaRobots>("add-meta-robots");
         }
     }
 }
