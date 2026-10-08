@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Carousel</summary>
 	[PublishedModel("carousel")]
-	public partial class Carousel : PublishedContentModel, IBase
+	public partial class Carousel : CarouselContainer, IBase
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
